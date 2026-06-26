@@ -4,6 +4,7 @@ A complete, from-scratch rebuild of the Dr. Palaskar Hospital website (orthopaed
 hospital, Vasai-Virar) with a custom **"Clinical Calm × Anatomical Precision"** design
 — an interactive **3D spine**, a **stethoscope cursor**, an animated **ECG line**, and a
 fully responsive layout that works on phones, tablets, laptops and desktops.
+The demo is hosted on FastAPI cloud => https://dr-palaskar-hospital.fastapicloud.dev
 
 The project ships **two independent frontends** plus a backend API:
 
