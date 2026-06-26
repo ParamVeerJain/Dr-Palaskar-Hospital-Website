@@ -1,6 +1,6 @@
 /* ============================================================
    models.js — interactive 3D spine (cervical → lumbar)
-   Uses global THREE (r128, via CDN). Graceful fallback.
+   Auto-rotates only (no dragging). Uses global THREE (r128).
    ============================================================ */
 (function () {
   "use strict";
@@ -69,7 +69,7 @@
     var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(W, H);
-    renderer.domElement.style.cssText = "position:relative;z-index:1;cursor:grab";
+    renderer.domElement.style.cssText = "position:relative;z-index:1;pointer-events:none";
     stage.appendChild(renderer.domElement);
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.74));
@@ -78,23 +78,8 @@
     var warm = new THREE.DirectionalLight(0xffe3c8, 0.45); warm.position.set(-4, 6, 7); scene.add(warm);
 
     var spine = buildSpine(THREE);
+    spine.rotation.x = 0.1;
     scene.add(spine);
-
-    var ry = -0.5, rx = 0.1, tRy = -0.5, tRx = 0.1, auto = !reduced, dragging = false, lx = 0, ly = 0;
-    var el = renderer.domElement;
-    function down(x, y) { dragging = true; auto = false; lx = x; ly = y; el.style.cursor = "grabbing"; }
-    function move(x, y) {
-      if (!dragging) return;
-      tRy += (x - lx) * 0.01; tRx += (y - ly) * 0.01;
-      tRx = Math.max(-0.8, Math.min(0.8, tRx)); lx = x; ly = y;
-    }
-    function up() { dragging = false; el.style.cursor = "grab"; }
-    el.addEventListener("mousedown", function (e) { down(e.clientX, e.clientY); });
-    addEventListener("mousemove", function (e) { move(e.clientX, e.clientY); }, { passive: true });
-    addEventListener("mouseup", up);
-    el.addEventListener("touchstart", function (e) { down(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
-    el.addEventListener("touchmove", function (e) { move(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
-    el.addEventListener("touchend", up);
 
     var visible = true;
     if ("IntersectionObserver" in window) {
@@ -111,9 +96,7 @@
     (function loop() {
       requestAnimationFrame(loop);
       if (!visible) return;
-      if (auto) tRy += 0.004;
-      ry += (tRy - ry) * 0.08; rx += (tRx - rx) * 0.08;
-      spine.rotation.y = ry; spine.rotation.x = rx;
+      if (!reduced) spine.rotation.y += 0.005;
       renderer.render(scene, camera);
     })();
   };

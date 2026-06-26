@@ -128,7 +128,7 @@ window.SITE = {
 
   stats: [
     { icon: "clock", value: "27", suffix: "+", label: "Years of experience" },
-    { icon: "users", value: "20", suffix: "K+", label: "Happy patients" },
+    { icon: "users", value: "20000", suffix: "+", label: "Happy patients" },
     { icon: "scope", value: "14", suffix: "", label: "Specialised treatments" },
     { icon: "shield", value: "24", suffix: "/7", label: "Emergency trauma care" },
   ],

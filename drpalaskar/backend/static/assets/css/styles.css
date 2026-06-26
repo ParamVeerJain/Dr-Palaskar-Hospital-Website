@@ -299,7 +299,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; line-height
 .hero__lead { margin-bottom: 30px; }
 .hero__cta { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
 .hero__trust { display: flex; gap: 28px; margin-top: 38px; flex-wrap: wrap; }
-.hero__trust .t b { font-family: var(--font-display); font-size: 1.7rem; color: var(--ink); display: block; line-height: 1; }
+.hero__trust .t b { font-family: var(--font-display); font-size: 1.7rem; color: var(--ink); display: block; line-height: 1; white-space: nowrap; }
 .hero__trust .t span { font-size: 0.82rem; color: var(--ink-faint); font-weight: 600; }
 
 /* hero visual / 3D stage */
@@ -348,7 +348,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; line-height
 .vital:hover { background: var(--mist); }
 .vital .ic { width: 46px; height: 46px; border-radius: 12px; background: var(--mist); color: var(--teal); display: grid; place-items: center; margin-bottom: 16px; }
 .vital .ic svg { width: 24px; height: 24px; }
-.vital b { font-family: var(--font-display); font-size: clamp(1.9rem, 3vw, 2.6rem); display: block; line-height: 1; color: var(--ink); }
+.vital b { font-family: var(--font-display); font-size: clamp(1.9rem, 3vw, 2.6rem); display: block; line-height: 1; color: var(--ink); white-space: nowrap; }
 .vital b .suf { color: var(--teal); }
 .vital span { font-size: 0.86rem; color: var(--ink-faint); font-weight: 600; margin-top: 8px; display: block; }
 
@@ -388,7 +388,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; line-height
 .split--rev .split__media { order: 2; }
 .about-media { position: relative; }
 .about-media__frame {
-  border-radius: var(--r-xl); overflow: hidden; aspect-ratio: 4/5;
+  border-radius: var(--r-xl); overflow: hidden; aspect-ratio: 16/9;
   background: var(--grad-teal); box-shadow: var(--shadow-lg); position: relative;
 }
 .about-media__frame img { width: 100%; height: 100%; object-fit: cover; }
@@ -425,7 +425,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; line-height
   background: #fff; border-radius: var(--r-xl); overflow: hidden; box-shadow: var(--shadow-lg); border: 1px solid var(--line);
 }
 .doc-card__photo { position: relative; background: var(--grad-teal); min-height: 420px; }
-.doc-card__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.doc-card__photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
 .doc-card__photo .ph { position:absolute; inset:0; display:grid; place-items:center; color:#fff; }
 .doc-card__exp { position: absolute; left: 20px; bottom: 20px; background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); border-radius: 14px; padding: 12px 16px; box-shadow: var(--shadow-md); }
 .doc-card__exp b { font-family: var(--font-display); font-size: 1.5rem; color: var(--teal-deep); line-height: 1; }
@@ -690,3 +690,6 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; line-height
 
 .crumb { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: var(--ink-faint); font-family: var(--font-mono); margin-bottom: 4px; }
 .crumb a { color: var(--ink-soft); } .crumb a:hover { color: var(--teal-deep); } .crumb b { color: var(--ink); }
+
+/* sections shown only on their own page, not on home */
+#view-home .home-hidden { display: none; }

@@ -2,9 +2,7 @@ import Hero from "@/components/Hero";
 import Marquee from "@/components/Marquee";
 import Vitals from "@/components/Vitals";
 import Treatments from "@/components/Treatments";
-import Gallery from "@/components/Gallery";
 import Testimonials from "@/components/Testimonials";
-import Updates from "@/components/Updates";
 import Contact from "@/components/Contact";
 import { About, Facilities, DoctorCard, CtaBand } from "@/components/Sections";
 
@@ -32,9 +30,7 @@ export default function Home() {
       <About />
       <DoctorCard />
       <Facilities />
-      <Gallery />
       <Testimonials />
-      <Updates />
       <CtaBand />
       <Contact />
     </main>

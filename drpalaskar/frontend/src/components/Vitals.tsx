@@ -30,7 +30,7 @@ function Vital({ stat, run }: { stat: (typeof site.stats)[number]; run: boolean 
         <Icon name={stat.icon} />
       </div>
       <b>
-        <span>{value}</span>
+        <span>{value.toLocaleString("en-US")}</span>
         <span className="suf">{stat.suffix}</span>
       </b>
       <span>{stat.label}</span>

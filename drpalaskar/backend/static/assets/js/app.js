@@ -186,12 +186,12 @@
     const els = $$("[data-count]");
     const run = (el) => {
       const target = parseFloat(el.dataset.count);
-      if (reduced) { el.textContent = target; return; }
+      if (reduced) { el.textContent = target.toLocaleString("en-US"); return; }
       const dur = 1400, t0 = performance.now();
       const step = (t) => {
         const p = Math.min((t - t0) / dur, 1);
         const e = 1 - Math.pow(1 - p, 3);
-        el.textContent = Math.round(target * e);
+        el.textContent = Math.round(target * e).toLocaleString("en-US");
         if (p < 1) requestAnimationFrame(step);
       };
       requestAnimationFrame(step);

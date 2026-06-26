@@ -63,7 +63,6 @@ export default function Models3D() {
 
   return (
     <div className="spine-stage" ref={stageRef} aria-label="Interactive 3D spine — cervical to lumbar">
-      <div className="spine-hint">Drag to rotate</div>
       {failed && (
         <div className="spine-fallback" aria-hidden="true">
           <svg width="150" height="320" viewBox="0 0 150 320">
@@ -95,7 +94,7 @@ function build(stage: HTMLDivElement): () => void {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(W, H);
-  renderer.domElement.style.cssText = "position:relative;z-index:1;cursor:grab";
+  renderer.domElement.style.cssText = "position:relative;z-index:1;pointer-events:none";
   stage.appendChild(renderer.domElement);
 
   scene.add(new THREE.AmbientLight(0xffffff, 0.74));
@@ -104,27 +103,8 @@ function build(stage: HTMLDivElement): () => void {
   const warm = new THREE.DirectionalLight(0xffe3c8, 0.45); warm.position.set(-4, 6, 7); scene.add(warm);
 
   const spine = buildSpine();
+  spine.rotation.x = 0.1;
   scene.add(spine);
-
-  let ry = -0.5, rx = 0.1, tRy = -0.5, tRx = 0.1, auto = !reduced, dragging = false, lx = 0, ly = 0;
-  const el = renderer.domElement;
-  const down = (x: number, y: number) => { dragging = true; auto = false; lx = x; ly = y; el.style.cursor = "grabbing"; };
-  const move = (x: number, y: number) => {
-    if (!dragging) return;
-    tRy += (x - lx) * 0.01; tRx += (y - ly) * 0.01;
-    tRx = Math.max(-0.8, Math.min(0.8, tRx)); lx = x; ly = y;
-  };
-  const up = () => { dragging = false; el.style.cursor = "grab"; };
-  const onMouseDown = (e: MouseEvent) => down(e.clientX, e.clientY);
-  const onMouseMove = (e: MouseEvent) => move(e.clientX, e.clientY);
-  const onTouchStart = (e: TouchEvent) => down(e.touches[0].clientX, e.touches[0].clientY);
-  const onTouchMove = (e: TouchEvent) => move(e.touches[0].clientX, e.touches[0].clientY);
-  el.addEventListener("mousedown", onMouseDown);
-  window.addEventListener("mousemove", onMouseMove, { passive: true });
-  window.addEventListener("mouseup", up);
-  el.addEventListener("touchstart", onTouchStart, { passive: true });
-  el.addEventListener("touchmove", onTouchMove, { passive: true });
-  el.addEventListener("touchend", up);
 
   let visible = true;
   let io: IntersectionObserver | undefined;
@@ -147,9 +127,7 @@ function build(stage: HTMLDivElement): () => void {
   const loop = () => {
     raf = requestAnimationFrame(loop);
     if (!visible) return;
-    if (auto) tRy += 0.004;
-    ry += (tRy - ry) * 0.08; rx += (tRx - rx) * 0.08;
-    spine.rotation.y = ry; spine.rotation.x = rx;
+    if (!reduced) spine.rotation.y += 0.005;
     renderer.render(scene, camera);
   };
   loop();
@@ -159,12 +137,6 @@ function build(stage: HTMLDivElement): () => void {
     io?.disconnect();
     document.removeEventListener("visibilitychange", onVis);
     window.removeEventListener("resize", onResize);
-    window.removeEventListener("mousemove", onMouseMove);
-    window.removeEventListener("mouseup", up);
-    el.removeEventListener("mousedown", onMouseDown);
-    el.removeEventListener("touchstart", onTouchStart);
-    el.removeEventListener("touchmove", onTouchMove);
-    el.removeEventListener("touchend", up);
     scene.traverse((o: THREE.Object3D) => {
       const mesh = o as THREE.Mesh;
       if (mesh.geometry) mesh.geometry.dispose();
