@@ -83,8 +83,10 @@ attendance and 3 months of paid payroll.
 * Home: next appointment, pending dues, visit count.
 * Book (same today/tomorrow slot rules) and cancel own appointments.
 * Full visit history with prescriptions (printable).
-* Bills with itemised breakdowns; **pay pending bills via a simulated UPI/cash/
-  card flow** — a `TXN-…` reference is generated, nothing real is charged.
+* Bills with itemised breakdowns and a **demo payment sheet** — UPI (with a
+  scannable-style QR + VPA field), card, netbanking (bank picker) or cash,
+  complete with a simulated processing step. A `TXN-…` reference is generated;
+  nothing real is charged and card/bank details never leave the browser.
 * Scans & reports uploaded by the hospital (X-ray/MRI/CT/lab…), opened inline.
 * Physiotherapy plans and session history (read-only).
 * Mediclaims with the frozen discharge summary once finalized.
@@ -107,15 +109,18 @@ attendance and 3 months of paid payroll.
   4 modalities, 2 traction types), record ₹350 sessions.
 * Operation theatre: view theatres, move surgeries through
   `SCHEDULED → IN_PROGRESS → COMPLETED/CANCELLED`.
-* Billing: view/collect any bill; reminders board; own attendance heatmap.
+* Billing: view/collect any bill; reminders board; own attendance calendar
+  (month view with check-in/out times and ‹ › navigation).
 * Staff **cannot** see colleagues' KYC/salary, create staff, run payroll, or
   open the admin dashboard.
 
 ### 3.4 Super-admin — `/admin` (Dr. Sameer / Dr. Lalan)
 Everything staff can do, plus:
-* **Daily report dashboard**: consultations (with department split and the
-  day's list), revenue collected/pending, admissions in/out, staff presence,
-  low stock — plus 5 live charts (30-day revenue line, consultations bar,
+* **Daily report dashboard**: KPI row (consultations, revenue collected /
+  pending, **patients admitted right now** with today's in/out, staff
+  presence), a **Recent activity feed** (admissions, discharges, staff
+  check-ins/outs, payments, consultations, bookings, surgeries, new
+  registrations — newest first), low stock — plus 5 live charts (30-day revenue line, consultations bar,
   department doughnut, top-dispensed medicines, room occupancy). Date picker
   re-renders the report for any past day. Printable.
 * **New consultation** with a prescription builder (auto-fee: Sameer ₹600 /
@@ -124,7 +129,7 @@ Everything staff can do, plus:
   `FINALIZED → SUBMITTED → APPROVED/REJECTED`.
 * Staff & HR: full employee records **including KYC** (Aadhar, PAN, bank),
   add employees (login created automatically), per-employee attendance
-  heatmap and salary history.
+  calendar and salary history.
 * Payroll: month preview with days-present, **pay one** or **⚡ Autopay all**
   (skips anyone already paid), `PAY-…` references.
 * Room and medicine catalogue management.
@@ -236,6 +241,15 @@ later catalogue/price changes can never alter a submitted claim.
 | HR | staff CRUD, attendance check-in/out/heatmap, payroll preview/pay/autopay/history |
 | Dashboard | `/daily-report?day=`, `/charts?days=`, `/staff-home` |
 
+Cancelled / no-show appointments free their slot immediately — the row is
+reused on rebooking, so a freed slot is genuinely bookable again.
+
+The whole UI is responsive: the sidebar becomes a slide-in drawer with a
+scrim on phones and tablets, tables scroll horizontally, modals go
+near-fullscreen, grids collapse, inputs are 16 px (no iOS auto-zoom), and
+touch targets grow on coarse pointers — tested layouts from 360 px phones to
+desktop.
+
 Errors always use one envelope:
 `{"error": {"code": "...", "message": "...", "details": {...}}}` with proper
 status codes (401 unauthenticated, 403 forbidden, 404, **409 for state
@@ -290,7 +304,19 @@ reminders lifecycle, attendance check-in/out + heatmap, KYC redaction,
 payroll pay/double-pay/autopay/history, and dashboard payload shapes.
 
 ```bash
-python -m pytest tests/          # 31 passed
+python -m pytest tests/          # 35 passed
+```
+
+There is also a browser-level UI smoke suite that loads the real pages with
+the real scripts (jsdom) against a running server and asserts sign-in flow,
+redirects, that every shell renders without script errors or loops, that the
+appointment actions fire exactly once, the full guest-booking submit succeeds
+end-to-end, the demo netbanking payment completes, and the attendance
+calendar renders with working month navigation:
+
+```bash
+python run.py                    # terminal 1
+cd tests/ui && npm i && node smoke.mjs   # terminal 2 (needs Node 20+)
 ```
 
 ---
