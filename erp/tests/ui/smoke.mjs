@@ -153,6 +153,10 @@ async function tShell(path, jar, mustContain, expectFetch, hash = '') {
   ok(p.navAttempts.length === 0, `no bounce to /login (got ${p.navAttempts.length})`);
   for (const t of mustContain) ok(text.includes(t), `page shows “${t}”`);
   for (const f of expectFetch) ok(p.calls.some(c => c.path.includes(f)), `fetched ${f}`);
+  if (p.window.document.querySelector('table.table tbody tr td')) {
+    ok(!!p.window.document.querySelector('td[data-th]'),
+       'table cells carry data-th labels (mobile stacking ready)');
+  }
   ok(p.pageErrors.length === 0, 'no script errors', p.pageErrors[0]);
   return p;
 }
@@ -299,6 +303,7 @@ async function tPayNetbanking(adminJar) {
   ok(!!payBtn, 'a Pay now button is listed');
   payBtn.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
   await sleep(300);
+  ok(d.body.classList.contains('modal-open'), 'body scroll locked while modal open');
   ok(!!d.querySelector('.fakeqr'), 'UPI tab shows the QR block');
   const nb = [...d.querySelectorAll('.paytab')].find(t => t.dataset.pm === 'NETBANKING');
   nb.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
@@ -310,6 +315,33 @@ async function tPayNetbanking(adminJar) {
   ok(pays.length === 1, `exactly one pay POST (got ${pays.length})`);
   const toasts = [...d.querySelectorAll('.toast')].map(t => t.textContent).join(' | ');
   ok(/Payment received — TXN-/.test(toasts), 'success toast with TXN reference', toasts);
+  // the paid bill reopens in a modal — lock stays, receipt shows PAID
+  ok(d.body.classList.contains('modal-open'), 'receipt modal keeps body locked');
+  ok(/PAID/.test(d.querySelector('#modal-bd')?.textContent || ''),
+     'receipt shows the bill as PAID');
+  ok(!!d.querySelector('.mb2 td[data-th="Item"]',),
+     'bill modal table labelled for phones');
+  d.querySelector('[data-action="close-modal"]').dispatchEvent(
+    new w.MouseEvent('click', { bubbles: true }));
+  await sleep(150);
+  ok(!d.body.classList.contains('modal-open'),
+     'body scroll unlocked after closing the receipt');
+  ok(p.pageErrors.length === 0, 'no script errors', p.pageErrors[0]);
+}
+
+async function tDrawerToggle(jar) {
+  console.log('▶ mobile drawer: burger opens with scrim, outside tap closes');
+  const p = await loadPage('/admin', { jar, hash: 'patients' });
+  await sleep(1100);
+  const w = p.window, d = w.document;
+  d.querySelector('[data-action="burger"]').dispatchEvent(
+    new w.MouseEvent('click', { bubbles: true }));
+  ok(d.querySelector('#sidebar').classList.contains('open'), 'drawer opens');
+  ok(d.body.classList.contains('nav-open'), 'scrim class applied to body');
+  d.querySelector('#view').dispatchEvent(
+    new w.MouseEvent('click', { bubbles: true }));
+  ok(!d.querySelector('#sidebar').classList.contains('open'), 'outside tap closes drawer');
+  ok(!d.body.classList.contains('nav-open'), 'scrim class removed');
   ok(p.pageErrors.length === 0, 'no script errors', p.pageErrors[0]);
 }
 
@@ -367,6 +399,7 @@ async function tAttendanceCalendar(jar) {
   await tGuestBookingSubmit();
   await tPayNetbanking(adminJar);
   await tAttendanceCalendar(adminJar);
+  await tDrawerToggle(adminJar);
 
   console.log(failures ? `\n${failures} FAILURE(S)` : '\nALL UI SMOKE TESTS PASSED');
   process.exit(failures ? 1 : 0);

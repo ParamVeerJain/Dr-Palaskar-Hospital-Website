@@ -108,7 +108,7 @@ img{max-width:100%}
 .check{display:flex;gap:8px;align-items:center;font-size:14px;margin:8px 0}
 
 /* ---------------------------------------------------------- app shell */
-.shell{display:grid;grid-template-columns:242px 1fr;min-height:100vh}
+.shell{display:grid;grid-template-columns:242px 1fr;min-height:100vh;min-height:100dvh}
 .sidebar{background:linear-gradient(180deg,#0C3D22 0%,#0A2E1A 100%);color:#DFF2E4;
   padding:20px 14px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh;overflow:auto}
 .sidebar .brand{display:flex;align-items:center;gap:10px;padding:4px 8px 16px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:10px}
@@ -126,18 +126,13 @@ img{max-width:100%}
   border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
 .topbar .greet b{font-size:16.5px}
 .content{padding:24px 26px 60px;max-width:1280px}
-@media(max-width:920px){.shell{grid-template-columns:1fr}
-  .sidebar{position:fixed;z-index:60;width:242px;transform:translateX(-100%);transition:.2s}
-  .sidebar.open{transform:none}
-  .content{padding:18px 14px 60px}}
 .burger{display:none}
-@media(max-width:920px){.burger{display:inline-flex}}
 
 /* ---------------------------------------------------------- modal & toast */
 .backdrop{position:fixed;inset:0;background:rgba(10,26,16,.5);backdrop-filter:blur(3px);
   display:flex;align-items:center;justify-content:center;z-index:100;padding:18px;
   animation:fade .15s}
-.modal{background:#fff;border-radius:18px;max-width:640px;width:100%;max-height:92vh;overflow:auto;
+.modal{background:#fff;border-radius:18px;max-width:640px;width:100%;max-height:min(92vh,92dvh);overflow:auto;overscroll-behavior:contain;
   box-shadow:var(--shadow-lg);animation:pop .18s}
 .modal .mh{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}
 .modal .mb2{padding:18px 20px}
@@ -248,7 +243,7 @@ img{max-width:100%}
 .reveal.in{opacity:1;transform:none}
 
 /* ---------------------------------------------------------- login */
-.login-wrap{min-height:100vh;display:grid;place-items:center;padding:20px;
+.login-wrap{min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:20px;
   background:
    radial-gradient(700px 420px at 12% 8%, rgba(30,158,74,.16), transparent 55%),
    radial-gradient(700px 420px at 90% 90%, rgba(245,146,30,.14), transparent 55%), var(--paper)}
@@ -313,82 +308,351 @@ img{max-width:100%}
 /* ========================= dashboard feed ========================== */
 .feedcard .feed{max-height:560px;overflow-y:auto;padding-right:6px}
 
-/* ===================== responsive: tablets ≤920px ================== */
+
+
+
+
+/* ╔══════════════════════════════════════════════════════════════════╗
+   ║  RESPONSIVE v2 — phones & tablets, portrait + landscape          ║
+   ╚══════════════════════════════════════════════════════════════════╝ */
+
+/* ---- room board gets its own breakpoints (separate from KPI grids) */
+.roomgrid{grid-template-columns:repeat(4,1fr)}
+@media(max-width:1080px){.roomgrid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:820px){.roomgrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:460px){.roomgrid{grid-template-columns:1fr}}
+
+/* ---- tablets & below: drawer app frame -------------------------- */
 @media(max-width:920px){
-  body.nav-open::after{content:'';position:fixed;inset:0;background:rgba(8,24,14,.42);
-    z-index:55;backdrop-filter:blur(1px)}
-  .sidebar{box-shadow:8px 0 30px rgba(0,0,0,.25);overflow-y:auto}
-  .topbar{position:sticky;top:0;z-index:40}
-  .content{padding:18px}
+  .sidebar{height:100vh;height:100dvh;
+    padding-left:max(18px,env(safe-area-inset-left))}
+  .topbar{padding-left:max(14px,env(safe-area-inset-left));
+    padding-right:max(14px,env(safe-area-inset-right))}
+  .content{padding-left:max(18px,env(safe-area-inset-left));
+    padding-right:max(18px,env(safe-area-inset-right));
+    padding-bottom:max(20px,env(safe-area-inset-bottom))}
 }
 
-/* ===================== responsive: phones ≤680px =================== */
+/* ---- phones ------------------------------------------------------ */
 @media(max-width:680px){
-  h1{font-size:22px}
-  h2{font-size:18.5px}
-  .content{padding:12px}
+  /* page header: title row stacks, its action buttons go full-width —
+     scoped with :has() so buttons elsewhere keep their natural size   */
+  .flex.between.wrap:has(> h1){flex-direction:column;align-items:stretch;gap:10px}
+  .flex.between.wrap:has(> h1) > .btn{width:100%;justify-content:center}
+  .flex.between.wrap:has(> h1) > .flex{width:100%;flex-wrap:wrap}
+  .flex.between.wrap:has(> h1) > .flex > .btn{flex:1;justify-content:center}
+  .flex.between.wrap:has(> h1) .input,
+  .flex.between.wrap:has(> h1) .select{max-width:none!important;flex:1;width:auto}
+
+  /* tables: consistent density + always scrollable in a card         */
+  .table th,.table td{padding:9px 10px;font-size:13px}
+  .table .btn.sm{padding:6px 10px}
+
+  /* modals: comfortable sheets                                        */
+  .modal .mh{padding:14px 16px}
+  .modal .mh h3{font-size:16px;line-height:1.3;padding-right:8px}
+  .modal .mb2{padding:14px 16px}
+  .modal .mf .btn{flex:1 1 auto;min-width:130px}
+  .modal .table{font-size:12.5px}
+  .modal .table th,.modal .table td{padding:7px 8px}
+
+  /* topbar: compact, name truncates instead of wrapping               */
+  .topbar .greet{min-width:0;flex:1}
+  .topbar .greet b{font-size:15px;display:block;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis}
+  .topbar > .flex{min-width:0}
+  .topbar > .flex:last-child{gap:6px;flex:0 0 auto}
+  .topbar .badge{display:none}
+
+  /* detail-page header cards (patient / admission / staff)            */
+  .card > .flex.between.wrap{gap:12px}
+  .card > .flex.between.wrap > .flex:last-child{width:100%}
+  .card > .flex.between.wrap > .flex:last-child .btn{flex:1;justify-content:center}
+  .avatar{flex:0 0 auto}
+
+  /* room + theatre cards breathe                                      */
+  .roomcard{padding:14px}
+
+  /* physio / mediclaim card action columns drop below content         */
+  .card .flex.between.wrap > div[style*="min-width"]{width:100%;min-width:0!important}
+
+  /* landing booking: date buttons split the row                       */
+  #book-widget [data-date]{flex:1;justify-content:center}
+  .hero .flex .btn{flex:1;justify-content:center}
+
+  /* login                                                             */
+  .login-card{padding:22px 18px;border-radius:18px}
+  .demo-creds{font-size:12px;line-height:1.8}
+  .demo-creds code{word-break:break-all}
+
+  /* misc consistency                                                  */
+  .tabbar{scrollbar-width:none}
+  .tabbar::-webkit-scrollbar{display:none}
+  .chip{font-size:11.5px}
+  .timeline{padding-left:4px}
+  .divider{margin:12px 0}
+  h3{font-size:15.5px}
+  h4{font-size:14px}
+}
+
+/* ---- small phones ------------------------------------------------ */
+@media(max-width:390px){
+  .content{padding:10px}
+  .card{padding:12px}
+  .g4{gap:8px}
+  .kpi .v{font-size:19px}
+  .kpi .l{font-size:11px}
+  .modal .mf .btn{min-width:104px}
+  .slotgrid{grid-template-columns:repeat(auto-fill,minmax(76px,1fr))}
+}
+
+/* ---- landscape phones (short viewport, auto-rotate) -------------- */
+@media(max-height:500px) and (orientation:landscape){
+  .content{padding:12px max(18px,env(safe-area-inset-right)) 12px
+    max(18px,env(safe-area-inset-left))}
+  .topbar{padding-top:8px;padding-bottom:8px}
+  .sidebar{width:min(242px,60vw)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  .kpi .v{font-size:19px}
+  .canvasbox{height:170px}
+  .feedcard .feed{max-height:46vh}
+  .modal{max-height:96vh;max-height:96dvh}
+  .modal .mb2{padding:12px 16px}
+  .login-wrap{align-items:flex-start;padding-top:16px;padding-bottom:16px}
+  .login-card img{width:150px}
+  .login-card{padding:16px 18px}
+  .splash img{width:min(220px,40vw)}
+  .hero{padding-top:8px}
+  .hero .in{padding-top:16px;gap:14px}
+  .section{padding:28px 16px}
+  .attcal .ac-cell{min-height:44px}
+  .fakeqr{width:118px;height:118px}
+}
+
+/* ---- large tablets landscape: keep the desktop frame ------------- */
+@media(min-width:921px) and (max-width:1180px){
+  .content{padding:20px}
+  .g4{gap:12px}
+  .roomgrid{grid-template-columns:repeat(3,1fr)}
+}
+
+
+/* ╔══════════════════════════════════════════════════════════════════╗
+   ║  RESPONSIVE LAYER — mobile-first refinements                     ║
+   ║  Breakpoints: ≤1080 small-laptop/tablet-landscape · ≤920 tablet  ║
+   ║  portrait (drawer nav) · ≤680 phones · ≤400 small phones ·       ║
+   ║  short-landscape phones · coarse pointers · safe areas.          ║
+   ╚══════════════════════════════════════════════════════════════════╝ */
+
+*{-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+:focus-visible{outline:2.5px solid var(--orange);outline-offset:2px}
+body.nav-open,body.modal-open{overflow:hidden}
+
+/* ---------------------------------------- ≤920px: drawer navigation */
+@media(max-width:920px){
+  .shell{grid-template-columns:1fr}
+  .burger{display:inline-flex}
+  .sidebar{position:fixed;inset:0 auto 0 0;height:100dvh;width:min(300px,84vw);
+    z-index:60;transform:translateX(-102%);transition:transform .22s ease;
+    overflow-y:auto;overscroll-behavior:contain;
+    padding-top:max(16px,env(safe-area-inset-top));
+    padding-bottom:max(16px,env(safe-area-inset-bottom));
+    box-shadow:10px 0 34px rgba(0,0,0,.28)}
+  .sidebar.open{transform:none}
+  body.nav-open::after{content:'';position:fixed;inset:0;z-index:55;
+    background:rgba(8,24,14,.45);backdrop-filter:blur(1.5px);animation:fade .15s}
+  .topbar{position:sticky;top:0;z-index:40;
+    padding-top:max(10px,env(safe-area-inset-top))}
+  .content{padding:18px 16px calc(56px + env(safe-area-inset-bottom))}
+  .nav-link{padding:13px 14px;font-size:15px}
+}
+
+/* --------------------------------------------------- ≤680px: phones */
+@media(max-width:680px){
+  h1{font-size:22px;line-height:1.2}
+  h2{font-size:18.5px} h3{font-size:16px}
+  .content{padding:12px 12px calc(54px + env(safe-area-inset-bottom))}
   .card{padding:14px;border-radius:14px}
-  .g4{grid-template-columns:repeat(2,1fr)}
-  .kpi .v{font-size:22px}
-  .topbar{padding:10px 12px}
+  .divider{margin:12px 0}
+
+  /* page headers: title on top, controls stretch below — consistent  */
+  .flex.between.wrap{flex-direction:column;align-items:stretch;gap:10px}
+  .flex.between.wrap>h1,.flex.between.wrap>h2{width:100%}
+  .flex.between.wrap>.btn{width:100%;justify-content:center}
+  .flex.between.wrap>.flex{width:100%;flex-wrap:wrap}
+  .flex.between.wrap>.flex>.input,
+  .flex.between.wrap>.flex>.select{flex:1 1 130px;max-width:none!important}
+  .flex.between.wrap>.flex>.btn{flex:1 1 auto;justify-content:center}
+  .flex.between.wrap>input[type=date]{max-width:none!important;width:100%}
+
+  .grid{gap:10px}
+  .g2,.g3{grid-template-columns:1fr}
+  .g4{grid-template-columns:1fr 1fr}
+  .kpi .v{font-size:21px}
+  .kpi .l{font-size:12px}
+
+  .topbar{padding:10px 12px;padding-top:max(10px,env(safe-area-inset-top))}
   .topbar .greet .muted{display:none}
-  .card.pad0{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  .card.pad0 .table{min-width:640px}
-  .modal{width:96vw;max-width:96vw;max-height:90vh;overflow-y:auto;border-radius:14px}
-  .mb2{padding:14px}
-  .mf{padding:12px 14px;flex-wrap:wrap}
-  .mf .btn{flex:1;justify-content:center}
-  .payupi{grid-template-columns:1fr;justify-items:center;text-align:center}
-  .payupi .field{text-align:left;width:100%}
-  .slotgrid{grid-template-columns:repeat(auto-fill,minmax(84px,1fr))}
-  .attcal{gap:4px}
-  .ac-cell{min-height:52px;padding:4px;border-radius:8px}
-  .ac-io{display:none}
+  .topbar .badge{display:none}
+  .topbar .greet b{font-size:15px;max-width:34vw;overflow:hidden;
+    text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle}
+
   .searchbar{flex-direction:column}
   .searchbar .btn{width:100%;justify-content:center}
-  .tabbar{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
-  .tab{white-space:nowrap}
-  .feedcard .feed{max-height:380px}
-  .canvasbox{height:220px}
-  .flex.between.wrap .btn{width:100%;justify-content:center}
-  .flex.between.wrap h1{width:100%}
-}
-@media(max-width:420px){
-  .g4{grid-template-columns:1fr 1fr}
-  .ac-hrs{font-size:10.5px}
-  .ac-d{font-size:11px}
-  .paytab{padding:8px 11px;font-size:12.5px}
+  .tabbar{overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;
+    margin-inline:-2px;padding-inline:2px}
+  .tabbar::-webkit-scrollbar{display:none}
+  .tab{white-space:nowrap;flex:0 0 auto}
+
+  .chips,.flex.wrap{row-gap:8px}
+  .canvasbox{height:215px}
+  .feedcard .feed{max-height:360px}
+  .timeline{padding-left:18px}
+
+  /* modals: top-aligned (keyboard-safe), near-fullscreen             */
+  .backdrop{align-items:flex-start;
+    padding:max(10px,env(safe-area-inset-top)) 10px
+            max(10px,env(safe-area-inset-bottom))}
+  .modal{width:100%;max-width:100%;border-radius:16px;
+    max-height:calc(100dvh - 20px)}
+  .modal .mh{padding:13px 14px}
+  .modal .mh h3{font-size:16px}
+  .modal .mb2{padding:14px}
+  .modal .mf{padding:11px 14px;flex-wrap:wrap}
+  .modal .mf .btn{flex:1 1 46%;justify-content:center}
+
+  /* toasts: centered above the home indicator                        */
+  #toasts{left:12px;right:12px;bottom:max(14px,env(safe-area-inset-bottom));
+    align-items:center}
+  .toast{max-width:100%;text-align:center}
+
+  /* payment sheet                                                    */
+  .payupi{grid-template-columns:1fr;justify-items:center;text-align:center}
+  .payupi .field{text-align:left;width:100%}
+  .paytab{flex:1 1 46%;justify-content:center;display:inline-flex}
+
+  /* attendance calendar                                              */
+  .attcal{gap:4px}
+  .ac-cell{min-height:52px;padding:4px;border-radius:8px;min-width:0}
+  .ac-io{display:none}
+  .ac-head b{font-size:15px;min-width:130px}
+
+  .slotgrid{grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:8px}
+  .roomcard .rn{font-size:17px}
 }
 
-/* ===================== touch ergonomics ============================ */
+/* -------------------- ≤640px: tables become labelled stacked cards  */
+@media(max-width:640px){
+  .card.pad0{border:none;background:none;box-shadow:none;overflow:visible}
+  .table{min-width:0;border-collapse:separate}
+  .table thead{display:none}
+  .table thead:has(th[colspan]){display:block}
+  .table thead:has(th[colspan]) tr{display:none}
+  .table thead:has(th[colspan]) tr:first-child{display:block}
+  .table thead:has(th[colspan]) tr:first-child th{display:block;text-align:left;
+    border:none;padding:2px 2px 10px;font-size:15px;color:var(--green-ink)}
+  .table,.table tbody{display:block;width:100%}
+  .table tr{display:block;background:#fff;border:1.5px solid var(--line);
+    border-radius:14px;padding:6px 13px;margin:0 0 10px;
+    box-shadow:var(--shadow-sm,0 1px 2px rgba(15,40,25,.05))}
+  .table tr.clickable{cursor:pointer}
+  .table td{display:flex;justify-content:space-between;align-items:baseline;
+    gap:12px;border:none!important;padding:7px 0;text-align:right;
+    white-space:normal;font-size:13.5px;min-width:0}
+  .table td::before{content:attr(data-th);flex:0 0 40%;text-align:left;
+    font-size:10.5px;font-weight:800;letter-spacing:.05em;
+    text-transform:uppercase;color:var(--muted)}
+  .table td>*{min-width:0}
+  .table td:first-child{display:block;text-align:left;padding:8px 0 9px;
+    border-bottom:1px dashed var(--line)!important;font-size:14.5px}
+  .table td:first-child::before{display:none}
+  .table td[data-th=""],.table td:not([data-th]):last-child{
+    justify-content:flex-end;border-top:1px dashed var(--line)!important;
+    padding-top:10px;margin-top:2px}
+  .table td[data-th=""]::before{display:none}
+  .table td .btn{margin:0}
+  .table td:not([data-th]):not(:first-child):not(:last-child){
+    display:block;text-align:left}
+  .table td:empty{display:none}
+  /* label-less tables (e.g. claim summaries) keep two-column lines   */
+  .table td:not([data-th]).right{display:flex;justify-content:flex-end}
+  .table td .tiny.muted{display:block}
+  /* inside modals rows sit flush                                     */
+  .mb2 .table tr{margin:0 0 9px;box-shadow:none}
+}
+
+/* --------------------------------------------- ≤400px: small phones */
+@media(max-width:400px){
+  h1{font-size:20px}
+  .kpi .v{font-size:19px}
+  .g4{gap:8px}
+  .ac-d{font-size:10.5px} .ac-hrs{font-size:10px}
+  .paytab{font-size:12.5px;padding:8px 10px}
+  .btn{padding-inline:13px}
+  .tgrid{grid-template-columns:1fr}
+}
+
+/* --------------------------- landscape phones (auto-rotate, short)  */
+@media(max-height:520px) and (orientation:landscape){
+  .content{padding:10px 16px 34px;
+    padding-left:max(16px,env(safe-area-inset-left));
+    padding-right:max(16px,env(safe-area-inset-right))}
+  .topbar{padding:7px 14px}
+  h1{font-size:19px;margin:4px 0 10px}
+  .card{padding:12px}
+  .kpi .v{font-size:19px}
+  .canvasbox{height:170px}
+  .backdrop{align-items:flex-start;padding:8px}
+  .modal{max-height:calc(100dvh - 16px)}
+  .sidebar{width:min(280px,60vw);
+    padding-left:max(14px,env(safe-area-inset-left))}
+  .ac-cell{min-height:42px}
+  .splash img{width:120px}
+  .hero .in{padding-top:16px}
+  .feedcard .feed{max-height:46dvh}
+}
+
+/* -------------------------------------------- touch-first controls  */
 @media(pointer:coarse){
   .btn{min-height:44px}
   .btn.sm{min-height:38px}
   .iconbtn{width:42px;height:42px}
   .tab{padding:11px 15px}
   .nav-link{padding:13px 14px}
-  .slot{min-height:42px}
+  .slot{min-height:44px;display:flex;align-items:center;justify-content:center}
+  .paytab{min-height:42px}
+  .check{padding:9px 0}
+  input[type=date],input[type=datetime-local],select.select{min-height:44px}
 }
-html{-webkit-text-size-adjust:100%}
 
-
-/* ================== landing page: phone polish ===================== */
+/* ------------------------------------- landing page on phones       */
 @media(max-width:680px){
-  .lp-nav{padding:10px 14px}
+  .lp-nav{padding:10px 12px;
+    padding-top:max(10px,env(safe-area-inset-top))}
   .lp-nav img{width:38px;height:38px}
-  .hero h1{font-size:27px}
-  .hero .in{padding-top:30px;gap:18px}
-  .section{padding:44px 16px}
-  .section h2{font-size:22px}
+  .hero h1{font-size:26px}
+  .hero .in{padding-top:26px;gap:18px}
+  .cta{flex-direction:column;align-items:stretch;display:flex;gap:10px}
+  .cta .btn{width:100%;justify-content:center}
+  .section{padding:40px 16px}
+  .section h2{font-size:21px}
   .tgrid{grid-template-columns:1fr 1fr;gap:10px}
   .tcard{padding:12px}
   .consultant{flex-direction:column;text-align:center}
   .track-form{flex-direction:column}
   .track-form .btn{width:100%;justify-content:center}
   .book-card{padding:16px}
-}
-@media(max-width:430px){
-  .tgrid{grid-template-columns:1fr}
+  .fgrid{grid-template-columns:1fr 1fr;gap:9px}
+  .fac{padding:11px 12px;font-size:13px}
+  .footer{padding-bottom:max(26px,env(safe-area-inset-bottom))}
+  .login-wrap{min-height:100dvh;padding:14px;
+    padding-top:max(22px,env(safe-area-inset-top));
+    padding-bottom:max(22px,env(safe-area-inset-bottom));
+    align-content:start;justify-items:center}
+  .login-card{width:100%;max-width:420px;margin-inline:auto}
+  .demo-creds{word-break:break-word}
+  .demo-creds code{white-space:nowrap}
 }
 
 @media print {

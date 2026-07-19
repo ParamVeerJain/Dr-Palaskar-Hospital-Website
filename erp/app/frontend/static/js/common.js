@@ -78,6 +78,7 @@ function modal(title, bodyHTML, footHTML = '') {
   closeModal();
   const bd = document.createElement('div');
   bd.className = 'backdrop'; bd.id = 'modal-bd';
+  document.body.classList.add('modal-open');
   bd.innerHTML = `<div class="modal" role="dialog" aria-modal="true">
       <div class="mh"><h3>${esc(title)}</h3>
         <button class="iconbtn" data-action="close-modal" aria-label="Close">✕</button></div>
@@ -90,7 +91,10 @@ function modal(title, bodyHTML, footHTML = '') {
   if (first) first.focus();
   return bd;
 }
-function closeModal() { $('#modal-bd')?.remove(); }
+function closeModal() {
+  $('#modal-bd')?.remove();
+  document.body.classList.remove('modal-open');
+}
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 /* tap outside the drawer closes it (mobile) */
 document.addEventListener('click', e => {
@@ -150,6 +154,33 @@ async function logout() {
   try { await api('/api/auth/logout', { method: 'POST' }); } catch (_) {}
   location.href = '/';
 }
+
+
+/* ------------------------------------------- responsive table labels */
+/* Copies each table's column headers onto its cells (data-th) so the
+   phone stylesheet can restyle rows as labelled cards. Runs for every
+   .table rendered anywhere (views, modals) via a MutationObserver.      */
+function enhanceTables(root = document) {
+  root.querySelectorAll?.('table.table').forEach(tbl => {
+    const heads = [...tbl.querySelectorAll('thead tr:last-child th')]
+      .map(th => th.textContent.trim());
+    if (!heads.length) return;
+    tbl.querySelectorAll('tbody tr').forEach(tr => {
+      const tds = tr.children;
+      if (tds.length !== heads.length) return;       // colspan / empty rows
+      for (let i = 0; i < tds.length; i++) {
+        if (!tds[i].hasAttribute('data-th'))
+          tds[i].setAttribute('data-th', heads[i]);
+      }
+    });
+  });
+}
+new MutationObserver(muts => {
+  if (muts.some(m => m.addedNodes.length)) {
+    cancelAnimationFrame(enhanceTables._raf || 0);
+    enhanceTables._raf = requestAnimationFrame(() => enhanceTables());
+  }
+}).observe(document.documentElement, { childList: true, subtree: true });
 
 /* ------------------------------------------------------------ topbar */
 function buildShell({ me, navItems, appName }) {

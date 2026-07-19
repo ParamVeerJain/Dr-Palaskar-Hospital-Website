@@ -503,7 +503,7 @@ V.rooms = async box => {
       ${V.isAdmin ? '<button class="btn" id="rm-new">＋ Add room</button>' : ''}</div>
     ${['ICU', 'VIP', 'DELUXE', 'ECONOMY'].filter(t => groups[t]).map(t => `
       <h3 class="mt">${t} <span class="muted small">· ${rupee(groups[t][0].daily_rate)}/day</span></h3>
-      <div class="grid g4">${groups[t].map(r => `
+      <div class="grid g4 roomgrid">${groups[t].map(r => `
         <div class="roomcard ${r.status === 'OCCUPIED' ? 'occ' : ''}">
           <div class="flex between"><span class="rn">${esc(r.room_number)}</span>${badge(r.status)}</div>
           ${r.status === 'OCCUPIED' ? `

@@ -244,11 +244,18 @@ later catalogue/price changes can never alter a submitted claim.
 Cancelled / no-show appointments free their slot immediately — the row is
 reused on rebooking, so a freed slot is genuinely bookable again.
 
-The whole UI is responsive: the sidebar becomes a slide-in drawer with a
-scrim on phones and tablets, tables scroll horizontally, modals go
-near-fullscreen, grids collapse, inputs are 16 px (no iOS auto-zoom), and
-touch targets grow on coarse pointers — tested layouts from 360 px phones to
-desktop.
+The UI is fully responsive, phone-first: on iPhone/Android every data table
+restyles into labelled stacked cards (no sideways scrolling), the sidebar
+becomes a slide-in drawer with a dim scrim (tap outside or pick a page to
+close, background scroll locks), modals are top-aligned and keyboard-safe
+with full-width footer buttons, toasts sit centred above the home indicator,
+and safe-area insets handle notches and rounded corners (`viewport-fit=cover`).
+Landscape phones get a compact short-height layout; tablets keep two-column
+grids with the drawer in portrait and the full sidebar in landscape. Inputs
+are 16 px (no iOS auto-zoom), touch targets are ≥44 px on touchscreens, and
+`100dvh` sizing avoids the mobile URL-bar jump. Static assets are
+version-stamped (`?v=…`) so browsers pick up updates without a manual
+hard-refresh.
 
 Errors always use one envelope:
 `{"error": {"code": "...", "message": "...", "details": {...}}}` with proper
@@ -325,6 +332,9 @@ cd tests/ui && npm i && node smoke.mjs   # terminal 2 (needs Node 20+)
 
 * **Port in use** — edit `run.py` or `lsof -i :8000`.
 * **Start fresh** — `python scripts/reset_db.py` (or delete `data/`).
+* **Old styles on a phone?** Assets are version-stamped, but if you upgraded
+  from a previous build do one hard refresh (pull-to-refresh twice on mobile,
+  Ctrl+F5 on desktop) to clear the old cache.
 * **Sunday** — booking is intentionally closed; slot lists show `closed: true`.
 * Demo dates in the seed are generated **relative to today**, so charts and
   "today" views are always populated no matter when you run it.
